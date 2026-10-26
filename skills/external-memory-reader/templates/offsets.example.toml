@@ -1,0 +1,24 @@
+# Offsets live here, not in code. A game update should mean editing this file, not Python.
+process = "Game.exe"
+module = "Game.exe"
+poll_hz = 20
+signatures_file = "signatures.example.toml"
+
+# A chain's base is a module RVA (int) or a signature name. Offsets follow Cheat Engine
+# semantics: address = [[module + base] + o1] + o2 ... ; an empty list means [module + base].
+[chains.player]
+base = "LocalPlayer"   # RVA of the global pointer, from the rel32 in the signature
+offsets = [0x0]        # deref the global -> player object
+
+[chains.camera]
+base = 0x0           # fill in from your Cheat Engine pointer scan
+offsets = [0x0, 0x0]
+
+# Field = [offset, struct format]. Offsets may be a signature name (read = "N:type").
+[structs.player.fields]
+health = ["HealthOffset", "f"]
+position = [0x90, "3f"]
+team = [0xA0, "i"]
+
+[structs.camera.fields]
+fov = [0x30, "f"]

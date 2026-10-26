@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+
+# never commit game binaries or memory dumps
+*.exe
+*.dll
+*.dmp
+*.bin
+global-metadata.dat

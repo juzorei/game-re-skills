@@ -1,0 +1,26 @@
+{
+  "name": "game-re-skills",
+  "owner": {
+    "name": "juzorei"
+  },
+  "metadata": {
+    "description": "Game reverse-engineering skills: pointer chains, AOB signatures, Unreal and Unity offsets, external readers, patch-day recovery",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "game-re-skills",
+      "description": "Find game data in memory, describe it with signatures that survive patches, and read it from your own tools",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/cheat-engine-pointer-chains",
+        "./skills/aob-signatures",
+        "./skills/unreal-sdk-offsets",
+        "./skills/unity-il2cpp-offsets",
+        "./skills/external-memory-reader",
+        "./skills/game-patch-recovery"
+      ]
+    }
+  ]
+}

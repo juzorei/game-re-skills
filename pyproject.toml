@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+testpaths = ["tools/sigtool/tests", "skills"]
+pythonpath = ["tools/sigtool/src", "tools/sigtool/tests"]
+python_files = ["test_*.py"]

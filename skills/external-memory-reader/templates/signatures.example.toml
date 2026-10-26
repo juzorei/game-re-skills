@@ -1,0 +1,12 @@
+# Signature file. Same format as `sigtool check`, so CI can verify it against every build:
+#   sigtool check signatures.example.toml game_v1.exe game_v2.exe
+
+[LocalPlayer]
+# mov rax, [rip+disp32] ; test rax, rax  -> rel resolves to the RVA of the global pointer
+pattern = "48 8B 05 ?? ?? ?? ?? 48 85 C0 74 ??"
+rel = 3
+
+[HealthOffset]
+# movss xmm0, [rcx+disp32] ; comiss xmm0, xmm1  -> read the field offset baked into the code
+pattern = "F3 0F 10 81 ?? ?? ?? ?? 0F 2F C1"
+read = "4:u32"
