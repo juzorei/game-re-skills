@@ -1,0 +1,27 @@
+name: sigtool bug
+description: sigtool crashes, gives a wrong result, or a confusing error
+labels: ["sigtool"]
+body:
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and output
+      description: The exact sigtool command, its full output, and what you expected.
+      placeholder: |
+        $ sigtool scan game.exe "48 8B 05 ?? ?? ?? ??"
+        sigtool: error: ...
+    validations:
+      required: true
+  - type: textarea
+    id: file
+    attributes:
+      label: About the file
+      description: PE or raw dump, 32/64-bit, packed or not, roughly how big. Never attach game binaries or dumps.
+  - type: input
+    id: version
+    attributes:
+      label: sigtool version
+      description: Output of `sigtool --version`
+      placeholder: sigtool 0.2.0
+    validations:
+      required: true

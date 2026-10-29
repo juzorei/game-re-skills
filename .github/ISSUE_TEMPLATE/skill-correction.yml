@@ -1,0 +1,36 @@
+name: Skill correction
+description: A step, tool flag, struct layout or offset in a skill is wrong or outdated
+labels: ["correction"]
+body:
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - cheat-engine-pointer-chains
+        - aob-signatures
+        - unreal-sdk-offsets
+        - unity-il2cpp-offsets
+        - external-memory-reader
+        - game-patch-recovery
+    validations:
+      required: true
+  - type: textarea
+    id: what-is-wrong
+    attributes:
+      label: What's wrong
+      description: Quote the exact step or sentence from the skill.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: What you observed instead (command output, engine version, tool version). Corrections from real games are the most valuable contributions here.
+    validations:
+      required: true
+  - type: input
+    id: context
+    attributes:
+      label: Game / engine / tool versions
+      description: e.g. "UE 5.3, Dumper-7 commit 9f3c2e1, Cheat Engine 7.5"
