@@ -28,8 +28,11 @@ Every skill opens with the same short scope section (see [SCOPE.md](SCOPE.md)): 
 sigtool scan <file> <pattern> [--section .text] [--all] [--rel N] [--read N:type] [--json]
 sigtool suggest <file> <address> [--rva] [--min 8] [--max 64] [--wildcard N,N] [--no-auto]
 sigtool check <signatures.toml> <file> [<file> ...] [--json]
+sigtool xref <file> <address> [--rva] [--json]
 sigtool chain --process game.exe --module game.exe --base 0x1234 --offsets 0x10,0x20 [--type f32]
 sigtool pe <file>
+sigtool demo [directory]
+sigtool practice [directory]
 ```
 
 - Patterns use IDA/Cheat Engine syntax: `48 8B 05 ?? ?? ?? ?? 48 85 C0`. `?` and `??` are full wildcards, `4?` and `?F` are nibble wildcards. Compact `488B05????????` and code-style `\x48\x8B\x05\x00 xxx?` (bytes plus `x?` mask) are accepted too.

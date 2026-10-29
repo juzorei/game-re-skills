@@ -215,6 +215,46 @@ def cmd_pe(args) -> int:
     return 0
 
 
+def cmd_xref(args) -> int:
+    from .xref import find_xrefs
+
+    binary = Binary.load(args.file, mapped=args.mapped)
+    if args.rva:
+        if binary.pe is None:
+            raise ValueError(f"{binary.path.name} isn't a PE file, --rva doesn't apply")
+        target = args.address
+    elif binary.pe is None:
+        target = args.address  # raw file or mapped dump: addresses are offsets
+    else:
+        target = binary.to_rva(args.address)
+        if target is None:
+            raise ValueError(f"file offset {args.address:#x} isn't mapped to an RVA; pass an RVA with --rva")
+    hits = find_xrefs(binary, target)
+    if args.json:
+        print(json.dumps({"target": target, "count": len(hits),
+                          "xrefs": [{"offset": h.offset, "rva": h.rva, "length": h.length,
+                                     "kind": h.kind} for h in hits]}, indent=2))
+    else:
+        print(f"file     {_describe(binary, args.section)}")
+        print(f"xrefs    {len(hits)} to {target:#x}")
+        for i, h in enumerate(hits[:SHOWN_MATCHES], 1):
+            print(f"  #{i}  rva {h.rva:#x}  offset {h.offset:#x}  {h.kind}")
+        if len(hits) > SHOWN_MATCHES:
+            print(f"  ... {len(hits) - SHOWN_MATCHES} more (use --json)")
+    return 0 if hits else 1
+
+
+def cmd_practice(args) -> int:
+    from .practice import write_practice
+
+    for path in write_practice(args.directory):
+        print(f"wrote {path}")
+    print(f"\nPractice pair ready in {args.directory}. The README lists xref/suggest/scan/check")
+    print("exercises: find the code that reads the GWorld-like global, signature it, read the")
+    print("health field offset from the store instruction, then regression-check both versions.")
+    return 0
+
+
 def cmd_demo(args) -> int:
     from .demo import write_demo
 
@@ -280,9 +320,22 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("file")
     p.set_defaults(func=cmd_pe)
 
+    p = sub.add_parser("xref", help="find instructions that reference a data or code address")
+    p.add_argument("file")
+    p.add_argument("address", type=hex_int, help="target address in hex (RVA with --rva, file offset without)")
+    p.add_argument("--rva", action="store_true", help="address is an RVA (PE required)")
+    p.add_argument("--section", help="scan a specific section (default: executable sections)")
+    p.add_argument("--json", action="store_true")
+    add_mapped(p)
+    p.set_defaults(func=cmd_xref)
+
     p = sub.add_parser("demo", help="write two synthetic builds and a signatures.toml to try sigtool on")
     p.add_argument("directory", nargs="?", default="sigtool-demo")
     p.set_defaults(func=cmd_demo)
+
+    p = sub.add_parser("practice", help="write a two-version practice 'game' (xref/suggest/check exercises)")
+    p.add_argument("directory", nargs="?", default="sigtool-practice")
+    p.set_defaults(func=cmd_practice)
     return parser
 
 

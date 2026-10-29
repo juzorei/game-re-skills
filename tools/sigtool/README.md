@@ -14,9 +14,11 @@ pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/si
 sigtool scan <file> <pattern> [--section .text] [--all] [--rel N[:K]] [--read N:type] [--json] [--mapped]
 sigtool suggest <file> <address> [--rva] [--min 8] [--max 64] [--wildcard N,N] [--no-auto] [--json] [--mapped]
 sigtool check <signatures.toml> <file> [<file> ...] [--json] [--mapped]
+sigtool xref <file> <address> [--rva] [--json] [--mapped]
 sigtool chain (--process game.exe | --pid N) [--module game.exe] --base 0x1234 --offsets 0x10,0x20 [--type f32]
 sigtool pe <file>
 sigtool demo [directory]
+sigtool practice [directory]
 ```
 
 Addresses and offsets are hex, with or without `0x`. Exit codes: `0` when the result is exactly one match (or the chain resolved), `1` when it isn't, `2` on errors.
@@ -85,6 +87,19 @@ expect = 1          # optional
 
 Exit code 1 if any signature doesn't match exactly once (or `expect` times), so it drops straight into CI or a pre-release script.
 
+### xref
+
+Finds every instruction in an executable section whose branch target or RIP-relative displacement resolves to the given address — the question you'd normally answer with an IDA/Ghidra cross-reference list, answered offline from the file on disk. Give the RVA with `--rva`, or a file offset without it.
+
+```console
+$ sigtool xref Game.exe 0x3040 --rva
+file     Game.exe (PE x64, image base 0x140000000), scanning .text
+xrefs    1 to 0x3040
+  #1  rva 0x1000  offset 0x400  rip
+```
+
+The sweep decodes linearly from the section start, so a handful of instructions reached only by jumping into the middle of another can be missed; what it reports is exact, never a false positive. Use the hits as anchor instructions for `scan`/`suggest`: an instruction that references your global is the most stable thing to signature.
+
 ### chain
 
 Windows only and read-only (`PROCESS_VM_READ`). Walks a Cheat Engine style chain: `"game.exe"+0x01234 -> 0x10 -> 0x20` becomes `--module game.exe --base 0x01234 --offsets 0x10,0x20`. The static address and every intermediate result are dereferenced; the last offset is added, not dereferenced. Pointer size follows the target (WOW64 processes use 4 bytes).
@@ -92,3 +107,7 @@ Windows only and read-only (`PROCESS_VM_READ`). Walks a Cheat Engine style chain
 ### --mapped
 
 Use it for a module dumped from memory, where file offsets equal RVAs. Scan dumps instead of the file on disk when the executable is packed.
+
+### practice
+
+`sigtool practice` writes a two-version synthetic "game" plus an exercise README: find the code that reads a GWorld-like global (`xref`), signature it (`suggest`), pull the health field offset out of the store instruction (`scan --read`), and regression-check both versions (`check`) — including watching a hardcoded offset fail exactly the way it fails on patch day. It's 5 KB, needs no game installed, and is the fastest way to learn the workflow the game-re-skills skills teach.
