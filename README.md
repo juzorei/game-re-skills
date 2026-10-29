@@ -2,7 +2,29 @@
 
 [English](README.md) | [Русский](README.ru.md)
 
+[![CI](https://github.com/juzorei/game-re-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/juzorei/game-re-skills/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/github/license/juzorei/game-re-skills)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/juzorei/game-re-skills)](https://github.com/juzorei/game-re-skills/releases)
+
 Agent skills for game reverse engineering, plus a small CLI that checks the agent's work.
+
+```text
+$ npx skills add juzorei/game-re-skills
+$ pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+$ sigtool demo && cd sigtool-demo
+$ sigtool check signatures.toml game-1.0.exe game-1.1.exe
+== game-1.0.exe
+  ok   GWorld           matches 1  rva 0x1100  rel -> rva 0x3040 (va 0x140003040, offset 0xc40)
+  ok   HealthOffset     matches 1  rva 0x1200  read = 0x1a8 (424)
+  ok   OldHealthOffset  matches 1  rva 0x1200
+== game-1.1.exe
+  ok   GWorld           matches 1  rva 0x1180  rel -> rva 0x3040 (va 0x140003040, offset 0xc40)
+  ok   HealthOffset     matches 1  rva 0x1200  read = 0x1b0 (432)
+  FAIL OldHealthOffset  matches 0
+5/6 passed
+```
+
+The game patched: code moved and the health field shifted from `0x1A8` to `0x1B0`. The wildcarded signatures survived it and now report the new values. The one that hardcoded the offset failed — which is what you want to find out before your users do.
 
 Coding agents already know a lot about x64, Cheat Engine and Unreal internals. What they lack is a workflow: they guess offsets, hardcode addresses that break on the next patch, and say "should work" without checking. These skills give Claude Code, Codex, Cursor, ZCode and other agents a step-by-step process for each job, and every skill ends with a result verified by `sigtool`.
 

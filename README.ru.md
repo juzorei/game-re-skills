@@ -2,7 +2,29 @@
 
 [English](README.md) | [Русский](README.ru.md)
 
+[![CI](https://github.com/juzorei/game-re-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/juzorei/game-re-skills/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/github/license/juzorei/game-re-skills)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/juzorei/game-re-skills)](https://github.com/juzorei/game-re-skills/releases)
+
 Скиллы для ИИ-агентов по реверсу игр и небольшая CLI-утилита, которая проверяет работу агента.
+
+```text
+$ npx skills add juzorei/game-re-skills
+$ pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+$ sigtool demo && cd sigtool-demo
+$ sigtool check signatures.toml game-1.0.exe game-1.1.exe
+== game-1.0.exe
+  ok   GWorld           matches 1  rva 0x1100  rel -> rva 0x3040 (va 0x140003040, offset 0xc40)
+  ok   HealthOffset     matches 1  rva 0x1200  read = 0x1a8 (424)
+  ok   OldHealthOffset  matches 1  rva 0x1200
+== game-1.1.exe
+  ok   GWorld           matches 1  rva 0x1180  rel -> rva 0x3040 (va 0x140003040, offset 0xc40)
+  ok   HealthOffset     matches 1  rva 0x1200  read = 0x1b0 (432)
+  FAIL OldHealthOffset  matches 0
+5/6 passed
+```
+
+Игру запатчили: код переехал, а поле здоровья сместилось с `0x1A8` на `0x1B0`. Сигнатуры с масками это пережили и теперь сообщают новые значения. Та, что захардкодила оффсет, сломалась — и именно это лучше узнать до того, как это заметят твои пользователи.
 
 Агенты уже много знают про x64, Cheat Engine и устройство Unreal. Им не хватает процесса: они угадывают оффсеты, хардкодят адреса, которые ломаются на следующем патче, и пишут «должно работать», ничего не проверив. Эти скиллы дают Claude Code, Codex, Cursor, ZCode и другим агентам пошаговый процесс для каждой задачи, и каждый скилл заканчивается результатом, проверенным через `sigtool`.
 
