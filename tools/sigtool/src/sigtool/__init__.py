@@ -1,6 +1,6 @@
 """Offline helpers for game signatures, PE layout and pointer chains."""
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 from .binary import Binary
 from .pattern import Pattern, parse_pattern

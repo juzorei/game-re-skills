@@ -147,8 +147,20 @@ If a chain's base is a global the code loads with `mov rax, [rip+x]`, replace th
 
 ## 6. Update files and re-verify
 
-1. Write the new values into the offsets file for the new build. Keep the old build's file unchanged.
-2. Update `signatures.toml`. If one pattern can't match both builds, use per-build files (`signatures.1.4.2.toml`, `signatures.1.5.0.toml`) or build-suffixed names, and pick one at runtime by build id or hash.
+1. Write the new values into the offsets file for the new build. Keep the old build's file unchanged. The format is plain TOML — a build header plus one table per struct with named fields:
+
+```toml
+# offsets/1.5.0.toml — build 1.5.0 (exe sha256 e3b0…)
+
+[Player]
+health = 0x1B0
+max_health = 0x1B4
+
+[GWorld]
+rva = 0x3040
+```
+
+2. Update `signatures.toml`. If one pattern can't match both builds, use per-build files (`signatures.1.4.2.toml`, `signatures.1.5.0.toml`) and pick one at runtime by build id or hash. There is no include mechanism: duplicate the still-valid shared entries into each per-build file, so every file is self-contained and `sigtool check <file> <its build>` passes on its own.
 3. Re-run the check. `sigtool check` exits 1 if any signature doesn't match exactly once in **every** file you pass:
 
 ```bash

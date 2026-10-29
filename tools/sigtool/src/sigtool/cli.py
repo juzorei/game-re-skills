@@ -94,9 +94,10 @@ def cmd_scan(args) -> int:
             print(f"  #{i}  offset {row['offset']:#x}  rva {_fmt(row['rva'])}  {extra}".rstrip())
         if len(rows) > len(shown):
             print(f"  ... {len(rows) - len(shown)} more (use --all)")
-        if len(hits) != 1:
-            hint = "lengthen it or anchor elsewhere" if hits else "check wildcards, section and build"
-            print(f"not unique: {hint}", file=sys.stderr)
+        if len(hits) == 0:
+            print("no matches: check the pattern, --section and that this is the right build", file=sys.stderr)
+        elif len(hits) != 1:
+            print("not unique: lengthen it or anchor elsewhere", file=sys.stderr)
     return 0 if len(hits) == 1 else 1
 
 

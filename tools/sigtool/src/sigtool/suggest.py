@@ -88,5 +88,15 @@ def suggest(
             hi = mid
         else:
             lo = mid + 1
-    result = _trim(prefix(lo))
+    # A pattern ending in a wildcard byte matches the same things with the wildcard
+    # dropped, so _trim removes them -- unless the caller asked for specific wildcard
+    # positions (e.g. a disp32 they plan to `read`): then extend to the first fixed
+    # byte past them, which keeps uniqueness (prefixes only lose matches) and gives
+    # the trailing anchor every example in the docs shows.
+    if extra_wildcards and lo < max_len:
+        while lo < max_len and masks[lo - 1] == 0:
+            lo += 1
+    result = prefix(lo)
+    if not extra_wildcards:
+        result = _trim(result)
     return Suggestion(result, 1, tuple(sorted(w for w in wild if w < len(result))))

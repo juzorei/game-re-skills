@@ -23,8 +23,8 @@ sigtool scan new.exe "74 ?? F3 0F 10 83 A8 01 00 00"
 ```
 
 - First half still unique: the function is at the same call site, and only the tail changed. Look at the bytes after the match in a disassembler and wildcard the parts that differ.
-- Both halves match 0 times: the function was rewritten, or the compiler chose different instructions (a different inlining decision, or a new optimisation level). Use the methods below.
-- A half matches many times: that half was never what made the pattern unique. Re-anchor on rarer bytes.
+- Both halves match 0 times (scan prints `no matches: check the pattern, --section and that this is the right build` on stderr): the function was rewritten, or the compiler chose different instructions (a different inlining decision, or a new optimisation level). Use the methods below.
+- A half matches many times (`not unique: lengthen it or anchor elsewhere`): that half was never what made the pattern unique. Re-anchor on rarer bytes.
 
 Common byte churn that doesn't mean the logic changed:
 
@@ -34,6 +34,7 @@ Common byte churn that doesn't mean the logic changed:
 | Struct member added | disp8/disp32 of `[reg+disp]` | wildcard the displacement |
 | Bigger stack frame | `sub rsp, imm`, `[rsp+disp]` | wildcard the immediate/displacement |
 | Function moved | `E8`/`E9` rel32, RIP-relative disp | `suggest` already wildcards these |
+| Branch opcode swapped | `E8` (call) ↔ `E9` (jmp), `0F 8x` kind | the opcode byte itself changed — `suggest` can't wildcard it (it only masks the displacement). Re-anchor the pattern *after* the branch, or on the callee via `sigtool xref`, and keep one signatures file per build if the opcode differs between them (see step 6.2) |
 | disp8 became disp32 | instruction length changes | re-suggest; wildcards can't fix a length change |
 
 ## String references

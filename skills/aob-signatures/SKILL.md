@@ -101,7 +101,7 @@ length   8 bytes, 4 fixed
 matches  1 (unique)
 ```
 
-`suggest` grows a pattern from the address until it's unique (binary search between `--min` and `--max` bytes) and auto-wildcards `E8`/`E9`/`0F 8x` rel32 and RIP-relative disp32. That's a linear-sweep heuristic, not a disassembler. It deliberately keeps struct displacements like `[rcx+1A8]` fixed, so a changed field offset breaks the sig loudly. When the displacement *is* the value you want (`read = ...`), or an immediate is volatile, wildcard it with `--wildcard` (byte indices from the start of the pattern, e.g. `4,5,6,7`) or edit the pattern by hand, then rescan. Use `--no-auto` when the heuristic misreads data as code. If it prints `not unique`, raise `--max` or start from a more distinctive instruction.
+`suggest` grows a pattern from the address until it's unique (binary search between `--min` and `--max` bytes) and auto-wildcards `E8`/`E9`/`0F 8x` rel32 and RIP-relative disp32. That's a linear-sweep heuristic, not a disassembler. It deliberately keeps struct displacements like `[rcx+1A8]` fixed, so a changed field offset breaks the sig loudly. When the displacement *is* the value you want (`read = ...`), wildcard it with `--wildcard` (byte indices from the start of the pattern, e.g. `4,5,6,7`): the result keeps those wildcards and extends to the next fixed anchor, giving the `F3 0F 11 81 ?? ?? ?? ?? C3` shape the examples use. Without `--wildcard`, trailing wildcards are trimmed. Editing by hand works too — then rescan. Use `--no-auto` when the heuristic misreads data as code. If it prints `not unique`, raise `--max` or start from a more distinctive instruction.
 
 The pattern doesn't have to start at the target instruction. Starting a few instructions earlier, at a distinctive sequence, is fine. Just account for it in the `rel`/`read` offset.
 
@@ -131,7 +131,7 @@ The instruction is 7 bytes, so the next instruction is `0x1A2B30 + 7 = 0x1A2B37`
 
 Negative displacements are common for calls. `E8 4B FE FF FF` at `0x1A2B50`: rel32 = `0xFFFFFE4B` = `-0x1B5`, next = `0x1A2B55`, target = `0x1A2B55 - 0x1B5 = 0x1A29A0`.
 
-With sigtool, `--rel N` resolves the rel32 at `match + N`, assuming the instruction ends right after it:
+With sigtool, `--rel N` resolves the rel32 at `match + N`, assuming the instruction ends right after it. `N` counts from the start of the *match*, not of the instruction: if the pattern begins at the opcode, the displacement sits at N=1 for `E8 rel32`, N=3 for `48 8B 05 disp32`. Sanity-check the result: a negative RVA, or one outside every section, means your N is wrong, not that the code is exotic:
 
 ```console
 $ sigtool scan game.exe "48 8B 05 ?? ?? ?? ?? 48 85 C0 74 ??" --rel 3
@@ -165,7 +165,9 @@ F3 0F 10 81 3C 01 00 00     movss xmm0, dword ptr [rcx+0x13C]
 sigtool scan game.exe "F3 0F 10 81 ?? ?? ?? ?? 0F 2F C1" --read 4:u32    # match line ends in: read = 0x13c (316)
 ```
 
-Read types: `i8 u8 i16 u16 i32 u32 i64 u64 f32 f64`, little-endian. The `N` in `--rel`/`--read` is a byte count from the start of the match (decimal, or `0x`-prefixed hex).
+Read types: `i8 u8 i16 u16 i32 u32 i64 u64 f32 f64`, little-endian. The `N` in `--rel`/`--read` is a byte count from the start of the match (decimal, or `0x`-prefixed hex). `--read` may point past the pattern's end — the file is longer than the pattern, and reading a displacement that follows the last matched byte is fine.
+
+If you know a global's RVA but nothing about the code that uses it, `xref` gives you the *readers* offline. The instruction that *writes* the field (the one whose displacement you usually want to `read`) isn't visible to `xref` — that's the "find out what writes this address" step from [cheat-engine-pointer-chains](../cheat-engine-pointer-chains/SKILL.md) (CE) or a disassembler. Don't invent store bytes: get them from a tool, or wildcard everything you haven't actually seen.
 
 Offsets under 0x80 are usually encoded as disp8 (`F3 0F 10 41 7C` = `[rcx+0x7C]`, `--read 4:u8`). disp8 is sign-extended, so the compiler switches to the disp32 form (ModRM `41` becomes `81`) once a field crosses 0x7F. If a patch pushes a field across that line, the signature breaks by design. Keep a second sig or note it.
 

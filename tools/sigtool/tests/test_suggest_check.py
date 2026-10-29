@@ -121,7 +121,7 @@ def test_cli_scan_check_suggest(tmp_path, make_build, capsys):
     assert out["count"] == 1 and out["matches"][0]["rel"]["rva"] == GWORLD_RVA
 
     assert main(["scan", exe, "DE AD BE EF"]) == 1
-    assert "not unique" in capsys.readouterr().err
+    assert "no matches" in capsys.readouterr().err
     sig_file = tmp_path / "s.toml"
     sig_file.write_text(SIGNATURES)
     assert main(["check", str(sig_file), exe]) == 0

@@ -101,3 +101,16 @@ def test_wrong_toml_types_are_value_errors(tmp_path, body, capsys):
     with pytest.raises(ValueError, match=r"\[X\]"):
         load_signatures(path)
     assert main(["check", str(path), str(path)]) == 2
+
+
+def test_suggest_keeps_explicit_trailing_wildcards(make_build):
+    """--wildcard 4,5,6,7 on the health store must yield F3 0F 11 81 ?? ?? ?? ?? C3,
+    not the trimmed F3 0F 11 81 -- the read-the-field-offset flow depends on it."""
+    from sigtool.demo import HEALTH_AT, TEXT_RAW
+
+    binary = Binary.load(make_build())
+    result = suggest(binary, TEXT_RAW + HEALTH_AT, auto=False, extra_wildcards={4, 5, 6, 7})
+    assert str(result.pattern) == "F3 0F 11 81 ?? ?? ?? ?? C3"
+    assert result.unique
+    plain = suggest(binary, TEXT_RAW + HEALTH_AT, auto=False)
+    assert not str(plain.pattern).endswith("??")
