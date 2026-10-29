@@ -132,7 +132,7 @@ Each hop line is `[address read] -> pointer found  + offset = next address`. The
 
 ### 6. When a chain isn't enough: signatures
 
-A module-relative base like `"game.exe"+0x2F4A1B0` survives restarts, but usually not game updates. For a chain that survives patches, find the instruction that loads the root pointer (often `mov rax,[rip+disp32]` near the instruction from step 2), make an AOB signature for it, and resolve the base from the signature at runtime instead of hardcoding it. Use the `aob-signatures` skill for that, and keep the field offsets (they also change on updates; signatures with `read = "N:u32"` can recover them).
+A module-relative base like `"game.exe"+0x2F4A1B0` survives restarts, but usually not game updates. For a chain that survives patches, find the instruction that loads the root pointer (often `mov rax,[rip+disp32]` near the instruction from step 2), make an AOB signature for it, and resolve the base from the signature at runtime instead of hardcoding it. Use the `aob-signatures` skill for that, and keep the field offsets (they also change on updates; signatures with `read = "N:u32"` can recover them). To try that flow offline first, `sigtool practice` writes a two-version 5 KB synthetic game with a `movss [rcx+0x1A8]`-style store instruction to sign and re-check across versions.
 
 ## Chain notation cheat sheet
 

@@ -179,3 +179,7 @@ Report the offsets file, signatures.toml, the `sigtool check` result, and the ch
 - **No PDB ships**, so don't expect symbol names. Reflection replaces them for UPROPERTY data. Native-only fields (Actors, ComponentToWorld) need manual confirmation.
 - **Non-shipping builds** (Development/Test/DebugGame) can carry extra members such as STATS data and editor-only FName fields. Re-dump instead of reusing shipping offsets.
 - For pattern craft and update resilience, follow the `aob-signatures` skill.
+
+## Practice
+
+`sigtool practice` writes a two-version, UE-like synthetic "game" (GWorld global, a store instruction with a `movss [rcx+0x1A8]`-style field offset, a rel32 caller, 5 KB, no game installed) plus an exercise README, so you can dry-run this skill's GWorld workflow — xref the global, sign the reader, extract the field offset, `check` across both versions — offline before doing it on the real Shipping exe.

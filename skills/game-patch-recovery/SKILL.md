@@ -59,6 +59,8 @@ Real output looks like this (from `sigtool demo`, which writes two synthetic bui
 
 Exit code: `0` if every entry matched exactly once (or its `expect` count) in every file, `1` otherwise, `2` on errors such as a missing file or a malformed TOML entry. In `--json`, each entry has `count`, `ok`, `rva` and `values` (`rel.rva` or `read`), which is what you compare between builds. If the new build is packed and you're checking a raw memory dump, add `--mapped`.
 
+**Rehearse before you touch the real builds.** `sigtool practice` writes `gworld-demo-v0.exe`/`gworld-demo-v1.exe`, a two-version synthetic game where all the code moved, a health-field offset shifted `0x1A8`→`0x1B8`, and a `call` became a `jmp` — exactly this skill's failure modes, in 5 KB, with no game installed. Run the whole recovery flow on it (xref → suggest → rebuild the failing entry → `check` on both versions) as a warm-up. In v0 the GWorld-like global sits at RVA `0x3040`; between the versions it survived while the code around it didn't.
+
 Sort every signature into one of four buckets. Each needs a different fix.
 
 | Result in new build | Meaning | Go to |
@@ -76,15 +78,16 @@ Work from cheap to expensive. Stop as soon as you have a confident address in th
 
 1. **Find out why the old pattern fails.** Run `sigtool scan` with the old pattern's first half, then its second half, on the new build. If one half still matches once, the function survived and only a few bytes changed (often register allocation or a stack offset). Widen those bytes and you're done.
 2. **String references.** If the function touches a unique string (log message, asset path, cvar name), find that string in the new build and follow the cross-references in IDA or Ghidra.
-3. **Neighbouring signatures.** Signatures that still match tell you where their functions are now. The linker usually keeps functions from the same source file in order. If the target sat `+0x3C0` after a surviving neighbour in the old build, start looking near the same spot in the new one.
-4. **Call graph.** Find a caller or callee that still matches, then follow the call edge. Unreal `exec` thunks and Unity `dump.cs` RVAs give you named entry points for free.
-5. **Binary diffing**, when the patch is large:
+3. **`sigtool xref`.** If a nearby global, a vtable entry or another data symbol the function references survived the patch (check its value in both builds — `.data` RVAs often don't move even when `.text` does), `sigtool xref builds/1.5.0/game.exe <rva> --rva` lists every instruction that addresses it, no IDA needed. The hits re-anchor you directly: feed one into `suggest`. The same works for rel32 callers of a surviving function.
+4. **Neighbouring signatures.** Signatures that still match tell you where their functions are now. The linker usually keeps functions from the same source file in order. If the target sat `+0x3C0` after a surviving neighbour in the old build, start looking near the same spot in the new one.
+5. **Call graph.** Find a caller or callee that still matches, then follow the call edge. Unreal `exec` thunks and Unity `dump.cs` RVAs give you named entry points for free.
+6. **Binary diffing**, when the patch is large:
    - BinDiff: open source (Apache 2.0), works from BinExport files out of IDA Pro, Ghidra or Binary Ninja.
    - Diaphora: IDA plugin (IDA 7.4+, Python 3).
    - Ghidra Version Tracking: built in, no plugin needed.
 
    Diff old against new, then jump to the matched function. Treat low-similarity matches as hints, not answers.
-6. **Unity IL2CPP:** don't hunt by hand. Re-dump with Il2CppDumper (metadata up to v31; use Cpp2IL or Il2CppInspectorRedux for v35+, see the `unity-il2cpp-offsets` skill) and read the new RVA straight from the `// RVA:` comment above the method in `dump.cs`.
+7. **Unity IL2CPP:** don't hunt by hand. Re-dump with Il2CppDumper (metadata up to v31; use Cpp2IL or Il2CppInspectorRedux for v35+, see the `unity-il2cpp-offsets` skill) and read the new RVA straight from the `// RVA:` comment above the method in `dump.cs`.
 
 Once you have the new address, rebuild the signature and check it against both builds:
 

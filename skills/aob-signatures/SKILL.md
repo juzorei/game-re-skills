@@ -30,12 +30,14 @@ pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/si
 ```text
 sigtool scan <file> <pattern> [--section .text] [--all] [--rel N[:K]] [--read N:type] [--json] [--mapped]
 sigtool suggest <file> <address> [--rva] [--min 8] [--max 64] [--wildcard N,N] [--no-auto] [--section S] [--json] [--mapped]
+sigtool xref <file> <address> [--rva] [--section S] [--json] [--mapped]
 sigtool check <signatures.toml> <file> [<file> ...] [--json] [--mapped]
 sigtool pe <file>
 sigtool demo [directory]
+sigtool practice [directory]
 ```
 
-Patterns use IDA/CE syntax: `48 8B 05 ?? ?? ?? ?? 48 85 C0`. `?`/`??` are full-byte wildcards, `4?`/`?F` are nibble wildcards; compact `488B05????????` and code-style `\x48\x8B\x05\x00 xxx?` work too. A pattern needs at least one fully fixed byte. On a PE, `scan` searches `.text` (or every executable section if there's no `.text`) and reports file offset and RVA; `--section .rdata` picks another section, `--section '*'` scans the whole file. Addresses (`suggest`) are hex with or without `0x`. Exit codes: `0` = exactly one match, `1` = not, `2` = error (bad file, bad pattern). `sigtool demo` writes two synthetic builds and a `signatures.toml` if you want to see the output before touching a real game.
+Patterns use IDA/CE syntax: `48 8B 05 ?? ?? ?? ?? 48 85 C0`. `?`/`??` are full-byte wildcards, `4?`/`?F` are nibble wildcards; compact `488B05????????` and code-style `\x48\x8B\x05\x00 xxx?` work too. A pattern needs at least one fully fixed byte. On a PE, `scan` searches `.text` (or every executable section if there's no `.text`) and reports file offset and RVA; `--section .rdata` picks another section, `--section '*'` scans the whole file. Addresses (`suggest` and `xref`) are hex with or without `0x`. Exit codes: `0` = exactly one match (≥1 xref), `1` = not, `2` = error (bad file, bad pattern). `sigtool demo` writes two synthetic builds and a `signatures.toml` if you want to see the output before touching a real game, and `sigtool practice` writes a bigger exercise pair (see step 2).
 
 ## Workflow
 
@@ -52,6 +54,19 @@ Find code that references the target: in IDA/Ghidra, list xrefs to the global or
 - Avoid inlined code. If a tiny getter got inlined into 40 call sites, the same bytes repeat and a later build with different inlining decisions breaks the count. Pick a site that's a real function or that sits in clearly unique surroundings.
 - Avoid code that's obviously generated per build (giant switch tables, unrolled loops) and hot loops that the optimizer reshuffles.
 - Keep 2 or 3 anchors for important targets. When one breaks, another usually survives.
+
+You don't need IDA or CE guesses to find the candidates. `sigtool xref` finds every instruction in an executable section whose branch target (rel32) or RIP-relative displacement resolves to a given address — offline, from the file on disk. Resolve the global's RVA first (from a dump, or from `--rel` on a signature you already have for a known reader of it), then:
+
+```console
+$ sigtool xref gworld-demo-v0.exe 0x3040 --rva
+file     gworld-demo-v0.exe (PE x64, image base 0x140000000), scanning .text
+xrefs    1 to 0x3040
+  #1  rva 0x1000  offset 0x400  rip
+```
+
+Each hit is an instruction that touches your global — a ready-made anchor for `suggest` (`sigtool suggest gworld-demo-v0.exe 0x1000 --rva`). Pass `--rva` when the address is an RVA; without it the address is a file offset, which in a mapped dump *is* the RVA, so dumps need no flag. The sweep decodes linearly, so it never reports a false positive but can miss a few instructions reached only by mid-instruction jumps. The same call finds rel32 callers of a function, not just data references. If you mis-guessed the global's RVA, `xref` returns nothing (exit 1) — cheap to retry.
+
+To try the whole flow (xref → suggest → scan --read → check) without a game installed, `sigtool practice` writes a 5 KB two-version synthetic game plus an exercise README; a signature built on one version must still match the other.
 
 ### 3. Decide which bytes to wildcard
 

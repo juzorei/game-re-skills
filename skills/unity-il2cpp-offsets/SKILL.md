@@ -221,3 +221,7 @@ sigtool chain --process MyGame.exe --module GameAssembly.dll --base 0x2F4E8A0 --
 - Value-type fields (`Vector3 pos; // 0x30`) are stored inline: `pos.y` is at 0x34, not behind a pointer.
 - Holding a native pointer (`m_CachedPtr`) after a scene change. Unity destroys native objects while the managed wrapper survives with `m_CachedPtr == 0`.
 - After an update: re-dump, run `sigtool check`, and diff Cpp2IL `diffable-cs` output between builds to see which field offsets moved.
+
+## Practice
+
+`sigtool practice` writes a two-version, UE-like synthetic "game" (5 KB, no game installed) with a global, a field-offset store instruction and a README of exercises: xref the global, sign the code that reads it, pull the field offset with `scan --read`, and regression-check both versions. It models the same static-global-plus-field-offset pattern this skill lands on (e.g. `GameManager_TypeInfo`), so it's a quick way to try the steps offline; for real IL2CPP targets, re-dump.

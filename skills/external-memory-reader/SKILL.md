@@ -119,7 +119,7 @@ Check `alive()` every tick and exit cleanly when the game closes. Re-attach on d
 
 ### 12. Test without the game
 
-Build tests on `FakeMemory`: a synthetic PE header plus `.text` containing the real instruction bytes of each signature, globals pointing at fake heap objects, and struct blobs packed with known values. Cover at least:
+Build tests on `FakeMemory`: a synthetic PE header plus `.text` containing the real instruction bytes of each signature, globals pointing at fake heap objects, and struct blobs packed with known values. (`sigtool practice` writes a small two-version synthetic exe built exactly like this, if you want realistic fixture material — its exercise set is the `xref`/`suggest`/`scan --read`/`check` loop feeding a reader.) Cover at least:
 
 - every signature resolves to the expected RVA or offset;
 - each chain resolves, and a null hop yields a named error;
