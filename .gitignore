@@ -5,6 +5,7 @@ __pycache__/
 build/
 dist/
 .venv/
+.traffic/
 
 # never commit game binaries or memory dumps
 *.exe
