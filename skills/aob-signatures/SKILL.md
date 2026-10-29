@@ -24,7 +24,7 @@ Two things come out of a signature:
 Install `sigtool` (Python 3.11+, offline, standard library only):
 
 ```bash
-pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+pip install game-re-sigtool
 ```
 
 ```text

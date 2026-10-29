@@ -19,7 +19,7 @@ If the patch *added* anti-cheat to a game that didn't have it, stop at that poin
 Install the verifier if it's missing:
 
 ```bash
-pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+pip install game-re-sigtool
 ```
 
 ## 1. Confirm it's actually the patch

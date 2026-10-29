@@ -26,7 +26,7 @@ sigtool chain --process game.exe --module game.exe --base 0x1234 --offsets 0x10,
 `--base` is the module-relative offset (the number after `"game.exe"+`), `--offsets` are the arrow offsets in order, left to right. All of them are hex, with or without `0x` (`1A8` and `0x1A8` are the same; decimal `424` is not). Install sigtool with:
 
 ```bash
-pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+pip install game-re-sigtool
 ```
 
 ```text

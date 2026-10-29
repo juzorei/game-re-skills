@@ -10,7 +10,7 @@
 
 ```text
 $ npx skills add juzorei/game-re-skills
-$ pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+$ pip install game-re-sigtool
 $ sigtool demo && cd sigtool-demo
 $ sigtool check signatures.toml game-1.0.exe game-1.1.exe
 == game-1.0.exe
@@ -65,7 +65,7 @@ npx skills add juzorei/game-re-skills
 Затем sigtool:
 
 ```bash
-pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+pip install game-re-sigtool
 ```
 
 ## Рамки

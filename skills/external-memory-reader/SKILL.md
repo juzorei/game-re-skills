@@ -38,7 +38,7 @@ Gather what earlier work found before writing code:
 Verify each signature before building on it:
 
 ```bash
-pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+pip install game-re-sigtool
 sigtool check signatures.toml Game.exe
 sigtool chain --process Game.exe --module Game.exe --base 0x1234 --offsets 0x10,0x20 --type f32
 ```

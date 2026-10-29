@@ -5,7 +5,7 @@ A small offline CLI for the boring, error-prone parts of game reverse engineerin
 Python 3.11+, standard library only.
 
 ```bash
-pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+pip install game-re-sigtool
 ```
 
 ## Commands

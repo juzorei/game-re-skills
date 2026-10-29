@@ -17,7 +17,7 @@ Use this for single-player or offline games, modding, interoperability, and priv
 Install sigtool if it's missing:
 
 ```bash
-pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+pip install game-re-sigtool
 ```
 
 Detailed tables are in [references/memory-layout.md](references/memory-layout.md). Tool notes, flags and version support are in [references/tools.md](references/tools.md).

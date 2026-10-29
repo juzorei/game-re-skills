@@ -10,7 +10,7 @@ Agent skills for game reverse engineering, plus a small CLI that checks the agen
 
 ```text
 $ npx skills add juzorei/game-re-skills
-$ pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+$ pip install game-re-sigtool
 $ sigtool demo && cd sigtool-demo
 $ sigtool check signatures.toml game-1.0.exe game-1.1.exe
 == game-1.0.exe
@@ -75,7 +75,7 @@ Manually: copy the folders from `skills/` into your agent's skills directory (`~
 Then install sigtool:
 
 ```bash
-pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+pip install game-re-sigtool
 ```
 
 ## Scope

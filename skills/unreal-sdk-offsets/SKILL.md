@@ -13,7 +13,7 @@ Unreal games ship with full reflection data (every UClass, UProperty and its off
 Install the verifier first:
 
 ```bash
-pip install "git+https://github.com/juzorei/game-re-skills#subdirectory=tools/sigtool"
+pip install game-re-sigtool
 ```
 
 ## 1. Pick the right binary and identify the engine version
