@@ -78,6 +78,16 @@ Then install sigtool:
 pip install game-re-sigtool
 ```
 
+## More from this portfolio
+
+Part of a series of focused skill+CLI tools by the same author:
+
+- [uitree](https://github.com/juzorei/uitree) — the UIA-automation side of the same desktop work
+- [harrecon](https://github.com/juzorei/harrecon) — network-facing reverse engineering
+- [skilldoctor](https://github.com/juzorei/skilldoctor) — keep installed skills clean
+
+Browse the rest at the [juzorei profile](https://github.com/juzorei?tab=repositories).
+
 ## Scope
 
 These skills are for single-player and offline games, modding, interoperability, research and private servers you run yourself. They don't help bypass anti-cheat, hide from detection, or cheat in online multiplayer, and the agent will say so. See [SCOPE.md](SCOPE.md).

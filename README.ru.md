@@ -68,6 +68,16 @@ npx skills add juzorei/game-re-skills
 pip install game-re-sigtool
 ```
 
+## Ещё из портфеля
+
+Один из серии прицельных наборов «скилл + CLI» одного автора:
+
+- [uitree](https://github.com/juzorei/uitree) — UIA-автоматизация той же десктопной работы
+- [harrecon](https://github.com/juzorei/harrecon) — реверс с сетевой стороны
+- [skilldoctor](https://github.com/juzorei/skilldoctor) — чистота установленного набора скиллов
+
+Остальные — в [профиле juzorei](https://github.com/juzorei?tab=repositories).
+
 ## Рамки
 
 Скиллы предназначены для одиночных и офлайн-игр, моддинга, совместимости, исследований и собственных приватных серверов. Они не помогают обходить античит, скрываться от детекта или читерить в онлайн-мультиплеере, и агент прямо об этом скажет. Подробнее в [SCOPE.md](SCOPE.md).
